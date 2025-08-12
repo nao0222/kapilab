@@ -1,0 +1,42 @@
+---
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath: string;
+}
+
+const { currentPage, totalPages, basePath } = Astro.props;
+---
+
+{totalPages > 1 && (
+  <nav class="flex flex-wrap gap-2 mt-12 items-center justify-center">
+    {currentPage > 1 && (
+      <a
+        href={currentPage === 2 ? `${basePath}/` : `${basePath}/page/${currentPage - 1}`}
+        class="flex items-center justify-center w-8 h-8"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#000">
+          <g><polygon points="17.77,3.77 16,2 6,12 16,22 17.77,20.23 9.54,12"/></g>
+        </svg>
+      </a>
+    )}
+
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+      <a
+        href={p === 1 ? `${basePath}/` : `${basePath}/page/${p}`}
+        class={`flex items-center justify-center w-8 h-8 border-1 rounded ${p === currentPage ? 'font-bold bg-black text-white' : ''}`}
+      >
+        {p}
+      </a>
+    ))}
+
+    {currentPage < totalPages && (
+      <a href={`${basePath}/page/${currentPage + 1}`}
+      class="flex items-center justify-center w-8 h-8">
+        <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="#000">
+          <g><polygon points="6.23,20.23 8,22 18,12 8,2 6.23,3.77 14.46,12"/></g>
+        </svg>
+      </a>
+    )}
+  </nav>
+)}
