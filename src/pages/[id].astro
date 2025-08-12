@@ -1,0 +1,142 @@
+---
+import { Image } from "astro:assets";
+import Layout from "@/layouts/Layout.astro";
+
+import { getCategories } from "@/lib/wp";
+import { getPostListWithCategories, getPickupPosts, fetchPostIds, getRelatedPosts } from "@/lib/postData";
+import { formatDateToDotAndWeekday } from '@/utils/date';
+import { generateTOCAndContent } from '@/utils/toc';
+import { replaceRelatedBlockWithContent } from '@/utils/acf_connection';
+
+
+export async function getStaticPaths() {
+  return await fetchPostIds();
+}
+
+const { id } = Astro.params;
+const res = await fetch(`${import.meta.env.PUBLIC_API_URL}posts/${id}?_embed`);
+const post = await res.json();
+
+//ピックアップ
+const { posts, categoryMap } = await getPostListWithCategories();
+const pickupPosts = await getPickupPosts();
+
+// 投稿者IDを取得
+const authorId = post.author;
+// 投稿者情報を別リクエストで取得（ACF含む）
+const authorRes = await fetch(`${import.meta.env.PUBLIC_API_URL}users/${authorId}`);
+const author = await authorRes.json();
+
+const authorData = post._embedded?.author?.[0] || {};
+const authorName = authorData.name || '名無し';
+const authorProfile = authorData.description || '';
+const authorAvatar = authorData.avatar_urls?.['96'] || '';
+const authorX = author.acf?.x || '';
+const authorInstagram = author.acf?.instagram || '';
+
+const { tocHtml, updatedHtml } = generateTOCAndContent(post.content.rendered);
+const contentHtml = await replaceRelatedBlockWithContent(updatedHtml);
+
+
+//関連する記事
+const relatedPost = post;
+if (!relatedPost) throw new Error('Post not found');
+
+const categories = await getCategories();
+const firstCategory = categories.find(cat => relatedPost.categories.includes(cat.id));
+const categorySlugForRelated = firstCategory?.slug || '';
+
+const relatedPosts = await getRelatedPosts(relatedPost.id, categorySlugForRelated, 3);
+
+---
+
+
+<Layout>
+    <main class="pt-[64px] lg:pt-[100px]">
+        <div class="border-b">
+            <div class="container mx-auto px-5 lg:px-10 md:py-14 py-8 flex flex-wrap justify-between items-center">
+                <div class="w-full md:w-[50%] order-2 md:order-1">
+                    <div class="text-xs md:text-sm text-[#888] font-medium flex space-x-5 md:space-x-10 mt-2 md:mt-0">
+                        <p>{formatDateToDotAndWeekday(post.date)}</p>
+                        <p>{post._embedded?.['wp:term']?.[0]?.map(cat => cat.name) || []}</p>
+                    </div>
+                    <h1 class="mt-3 md:mt-6 text-xl lg:text-3xl font-bold leading-normal">{post.title.rendered}</h1>
+                    <div class="mt-3 md:mt-5 flex space-x-2 md:space-x-3 items-center">
+                        <div class="overflow-hidden rounded-full"><img class="w-[30px] md:w-[42px]" src={authorAvatar} alt={authorName}></div>
+                        <p class="font-bold text-sm md:text-base">{authorName}</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-[43.4%] order-1 md:order-2">
+                    <div class="overflow-hidden rounded-2xl"><img class="w-full" src={post._embedded?.['wp:featuredmedia']?.[0]?.source_url || ''} alt={post.title.rendered}></div>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto px-5 lg:px-10 md:py-14 py-8 flex flex-wrap">
+            <article class="w-full lg:w-[65%]">
+                {tocHtml && (
+                    <div class="bg-[#F1ECE5] border border-black rounded-[10px]">
+                        <h2 class="text-center flex items-center justify-center -mt-5">
+                            <span class="flex items-center justify-center gap-[10px] bg-black text-white text-lg font-bold rounded-[5px] py-2 px-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="none"><g fill="#fff" clip-path="url(#a)"><path d="M3.725 24c-.171-.134-.326-.254-.33-.492L3.39 19.13l-3.08-.812c-.204-.056-.277-.244-.31-.434L4.313 1.968c.095-.196.35-.267.558-.22l6.479 1.726c.23-.743.635-1.36 1.357-1.708.156-.075.648-.197.702-.241.037-.03.288-.576.406-.722.755-.929 2.179-1.07 3.113-.332 1.412 1.115.992 3.33-.724 3.85l-.101.414 3.557.948c.738.315.05 1.187.031 1.746l.004 16.126c-.03.242-.14.327-.332.444zM15.383.952c-1.618.193-1.408 2.722.36 2.513 1.57-.185 1.353-2.717-.36-2.513m-2.02 1.581c-1.21.35-1.464 1.995-.394 2.663.85.531 1.94.167 2.236-.787-.938-.154-1.76-.92-1.843-1.876m5.574 3.938-3.332-.873c-.811.883-2.147 1.039-3.165.403-.306.205-.842.99-1.225.42-.335-.495.274-.76.528-1.099l-.364-.844-6.327-1.66L1.1 17.534l10.867 2.899.064-.075c.24-.732.345-1.63.622-2.336.083-.211.146-.377.404-.399l2.715.659zm-.19 16.591V10.97l-2.288 8.205c-.109.119-.256.186-.39.27-.96.601-2.377 1.466-3.383 1.94-.111.051-.22.11-.343.128l-7.957-2.105v3.656H18.75zm-3.92-4.03-1.37-.376-.33 1.36z"/><path d="M5.837 7.933a.8.8 0 0 1 .31.002l9.46 2.565c.384.301.099.973-.414.833l-9.39-2.496c-.406-.142-.377-.81.034-.904M5.158 9.861c.146-.143.364-.129.553-.089l9.397 2.536c.43.292.093.95-.386.854-2.991-.944-6.233-1.486-9.201-2.45-.404-.13-.755-.464-.363-.85M7.96 13.063a.6.6 0 0 1-.41.136c-.798-.311-1.965-.392-2.717-.726-.523-.232-.344-.934.222-.915.825.288 1.89.39 2.685.702.333.131.484.548.221.803M9.571 12.808c.644-.105.802.838.174.925-.629.086-.744-.832-.174-.925"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h20v24H0z"/></clipPath></defs></svg>
+                                目次
+                            </span>
+                        </h2>
+                        <div set:html={tocHtml} class="p-[30px] pt-3"></div>
+                    </div>
+                )}
+                <div class="post" set:html={contentHtml}></div>
+
+                {relatedPosts.length > 0 ? (
+                    <div class="w-full mt-24">
+                        <h2 class="text-center w-full relative">
+                            <span class="bg-[#F5F3EE] inline-block px-8 font-bold text-lg">関連する記事</span>
+                            <span class="bg-black block h-[1px] w-full absolute left-0 top-[50%] -z-1"></span>
+                        </h2>
+                    <ul class="grid gap-6 lg:gap-[30px] lg:grid-cols-3 mt-5">
+                    {relatedPosts.map((post) => (
+                        <li class="w-full">
+                            <a href={`/${post.slug}`} class="group grid grid-cols-2 lg:grid-cols-1 items-center gap-4 lg:gap-2">
+                                <div class="overflow-hidden rounded-2xl"><img class="w-full transition duration-500 group-hover:scale-105" src={post._embedded?.['wp:featuredmedia']?.[0]?.source_url || ''} alt={post.title.rendered}></div>
+                                <p class="font-bold text-sm leading-relaxed transition duration-500 group-hover:text-[#FE2F8C]">{post.title.rendered}</p>
+                            </a>
+                        </li>
+                    ))}
+                    </ul>
+                    </div>
+                    ) : (
+                    <p>関連記事はありません。</p>
+                )}
+
+
+            </article>
+            <aside class="w-full lg:w-[26.6%] lg:ml-[8.4%] mt-16 lg:mt-0">
+                <div class="border bg-white rounded-2xl overflow-hidden px-6 py-10">
+                    <div class="mx-auto overflow-hidden w-[90px] rounded-full"><img src={authorAvatar} alt={authorName}></div>
+					<p class="text-center mt-2 font-bold">{authorName}</p>
+					<p class="mt-7 leading-loose text-sm">{authorProfile}</p>
+					<ul class="mt-5 flex justify-center space-x-2">
+						<li><a href={`https://x.com/${authorX}`} target="_blank" class="bg-black flex items-center justify-center w-10 h-10 rounded-lg border transition duration-500 hover:bg-white group fill-white"><svg class="group-hover:fill-black transition duration-500" width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_42_596)"><path d="M0.816895 21.7236L8.79711 12.2729L0.816895 0.453369H6.90017L12.2453 8.26355L18.8004 0.453369H20.6437L13.0284 9.45332L21.2991 21.7236H15.1953L9.60364 13.4988L2.61944 21.7236H0.816895ZM18.8004 20.3944L16.335 16.767L5.99901 1.82421H3.27479L16.0762 20.3941H18.8004V20.3944Z"/></g><defs><clipPath id="clip0_42_596"><rect width="20.4824" height="21.2702" fill="white" transform="translate(0.816895 0.453369)"/></clipPath></defs></svg>	</a></li>
+						<li><a href={`https://www.instagram.com/${authorInstagram}`} target="_blank" class="bg-black flex items-center justify-center w-10 h-10 rounded-lg border transition duration-500 hover:bg-white group fill-white"><svg class="group-hover:fill-black transition duration-500" width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_42_600)"><path class="group-hover:fill-black transition duration-500" d="M15.2885 24.122H10.2662C10.2181 24.0457 10.0911 24.0758 10.0134 24.0748C8.08029 24.0545 6.18733 24.0642 4.45978 23.0837C2.08215 21.7339 1.18673 19.3463 1.05089 16.7092C1.02963 16.2932 1.10402 15.8407 1.00422 15.4395C1.04719 13.3489 0.946468 11.2486 1.00422 9.15896C1.08138 6.37522 1.41359 3.69698 3.82033 1.93632C5.80523 0.484292 7.76565 0.58933 10.1068 0.524549C11.8916 0.4755 13.6635 0.476889 15.4479 0.524549C17.6989 0.584703 19.6432 0.476426 21.5971 1.79704C24.2612 3.59749 24.5292 6.48812 24.5985 9.45695C24.6456 11.4666 24.6087 13.5039 24.5482 15.507C24.4779 17.8364 24.3998 19.8913 22.798 21.7422C20.8371 24.0082 18.0533 24.0549 15.2885 24.122ZM10.9477 2.3375C8.16438 2.39765 4.92644 2.15796 3.53063 5.11013C2.79507 6.66581 2.92952 8.43248 2.89533 10.1075C2.85283 12.1787 2.80015 14.316 2.89164 16.3881C3.06167 20.2407 4.64506 21.9653 8.49012 22.1841C10.591 22.3035 12.7043 22.2753 14.8029 22.2267C17.2651 22.1698 20.0147 22.459 21.6396 20.212C22.8451 18.5448 22.6654 16.3978 22.7051 14.4451C22.7467 12.4054 22.797 10.3005 22.7088 8.25665C22.573 5.11383 21.367 2.78541 17.9836 2.46336C15.7686 2.25236 13.1872 2.28937 10.9477 2.33796V2.3375Z"/><path class="group-hover:fill-black transition duration-500" d="M12.1923 6.54042C16.9332 6.13924 20.1781 11.2491 17.6582 15.3437C15.4201 18.9803 10.0886 18.9803 7.85101 15.3437C5.61337 11.7072 7.97668 6.89718 12.1928 6.54042H12.1923ZM12.4686 8.38761C9.35724 8.61295 7.70223 12.3346 9.71439 14.7686C11.3033 16.6902 14.168 16.706 15.7726 14.7935C17.9756 12.1685 15.871 8.14098 12.4681 8.38761H12.4686Z"/><path d="M18.9178 4.69147C20.8399 4.40967 21.1028 7.2383 19.3614 7.44513C17.4878 7.66817 17.2272 4.93949 18.9178 4.69147Z"/></g><defs><clipPath id="clip0_42_600"><rect width="23.6336" height="23.6336" transform="translate(0.986328 0.488525)"/></clipPath></defs></svg></a></li>
+					</ul>
+                </div>
+                <ul class="mt-7 space-y-6">
+                    {pickupPosts.map((post) => (
+                        <li class="w-full">
+                            <a href={`/${post.slug}`} class="group">
+                                <div class="overflow-hidden rounded-2xl"><img class="w-full transition duration-500 group-hover:scale-105" src={post._embedded['wp:featuredmedia']?.[0]?.source_url ?? ''} alt={post.title.rendered}></div>
+								<p class="text-xs text-[#888] font-bold mt-2 transition duration-500 group-hover:text-[#FE2F8C]">{post.categories.map((catId) => categoryMap.get(catId)).join(" / ")}</p>
+								<p class="font-bold mt-1 leading-relaxed transition duration-500 group-hover:text-[#FE2F8C]">{post.title.rendered}</p>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+                <div class="mt-20">
+                    <h2 class="font-bold text-lg">【PR】おすすめサービス</h2>
+                    <div class="mt-[10px] grid gap-5">
+                        <div>サービス</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+</Layout>

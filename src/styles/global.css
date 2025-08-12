@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+html{
+    scroll-behavior: smooth;
+}
+
+@layer base {
+    .post h2.wp-block-heading{
+        @apply bg-black text-white text-2xl font-bold px-5 py-4 leading-normal mt-15;
+        scroll-margin-top: 110px;
+    }
+    .post h3.wp-block-heading{
+        @apply text-xl font-bold leading-normal mt-10 border-b-4 pb-3;
+        scroll-margin-top: 110px;
+    }
+    .post h4.wp-block-heading{
+        @apply text-lg font-bold leading-normal mt-10;
+        scroll-margin-top: 110px;
+    }
+    .post p{
+        @apply mt-[30px] leading-relaxed;
+    }
+    .post a{
+        @apply text-[#2750F3] underline hover:opacity-80;
+    }
+    .post .wp-block-image{
+        @apply mt-[30px] max-w-full;
+    }
+    .post .wp-block-list{
+        @apply bg-[#F1ECE5] border-1 rounded-[5px] font-medium mt-[30px] p-7 grid gap-2;
+    }
+    .post .wp-block-list li{
+        @apply flex relative pl-7;
+    }
+    .post > .wp-block-quote{
+        @apply border border-[#dcdcdc] py-6 px-8 bg-white mt-10 relative;
+    }
+    .post > .wp-block-quote > * {
+         @apply mt-0;
+    }
+    .post strong{
+        @apply text-[#FE2F8C] font-bold underline;
+    }
+    .post em{
+        @apply not-italic;
+        background:linear-gradient(transparent 50%, #FFAFD3 50%);
+    }
+    .post table{
+        @apply bg-white border-1 w-full mt-10;
+    }
+    .post table th{
+        @apply bg-[#F1ECE5] font-bold p-5 border-1;
+    }
+    .post table td{
+        @apply border-1 font-medium p-5;
+    }
+    .post .wp-block-buttons{
+        @apply mt-10;
+    }
+    .post .wp-block-button{
+        @apply max-w-[580px] mx-auto;
+    }
+    .post .wp-block-button__link{
+        @apply bg-[#DCED22] font-bold text-lg text-black text-center no-underline flex items-center justify-center h-20 rounded-full hover:cursor-pointer;
+        box-shadow: 4px 4px 0 0 #B8C805;
+    }
+
+    .toc_list{
+        @apply leading-[1.8];
+    }
+    .toc_list li a{
+        @apply flex hover:opacity-80 text-[15px] font-medium;
+    }
+    .toc_list li .toc_number{
+        @apply flex-shrink-0 mr-2 relative;
+    }
+    .toc_list > li > a{
+        @apply font-bold;
+    }
+    .toc_list > li > a > .toc_number{
+        @apply bg-black text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full mt-[3px];
+    }
+    .toc_list > li li{
+        @apply ml-8;
+    }
+}
+
+.post .wp-block-list li::before{
+    content: '';
+    position: absolute;
+    background-image: url('data:image/svg+xml,%3Csvg%20width%3D%2218%22%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20clip-path%3D%22url(%23clip0_42_629)%22%3E%0A%3Cpath%20d%3D%22M9.59338%2018H8.39933L7.51413%2017.8843C3.76437%2017.2675%200.741422%2014.2392%200.123281%2010.4899L0.00757162%209.60427C0.0251699%209.21095%20-0.0161861%208.80091%200.00757162%208.40979C0.216552%204.95348%202.59409%201.78842%205.82778%200.585133C6.71033%200.256925%208.11556%20-0.0695241%209.05091%200.0127481C9.85911%200.0840213%209.91191%201.28335%209.00999%201.3797C8.40065%201.44481%207.89206%201.42765%207.26952%201.57064C1.94515%202.7946%20-0.435026%209.21887%202.90733%2013.6061C6.15686%2017.8711%2012.622%2017.5803%2015.4721%2013.0443C16.3437%2011.6571%2016.4756%2010.6162%2016.6169%209.02573C16.6987%208.10313%2017.8597%208.16209%2017.9772%208.8581C18.0472%209.27254%2017.9403%2010.0587%2017.8703%2010.4903C17.2139%2014.5371%2013.6876%2017.7527%209.59382%2018.0004L9.59338%2018Z%22%20fill%3D%22black%22%2F%3E%0A%3Cpath%20d%3D%22M16.8882%202.27059C17.487%202.17644%2017.9058%202.88434%2017.5292%203.36873L8.91%2011.9937C8.59147%2012.3082%208.19155%2012.3364%207.85586%2012.0275C6.81756%2010.8031%205.63672%209.69488%204.58962%208.4806C4.30672%208.15239%204.09202%207.75115%204.46599%207.37235C5.00582%206.82548%205.49901%207.43966%205.85494%207.8123C6.58615%208.57783%207.25972%209.40671%207.99577%2010.167C8.05165%2010.2246%208.3649%2010.5585%208.41285%2010.5502L16.4575%202.50773C16.571%202.41402%2016.7417%202.29391%2016.8882%202.27059Z%22%20fill%3D%22%23FE2F8C%22%2F%3E%0A%3C%2Fg%3E%0A%3Cdefs%3E%0A%3CclipPath%20id%3D%22clip0_42_629%22%3E%0A%3Crect%20width%3D%2218%22%20height%3D%2218%22%20fill%3D%22white%22%2F%3E%0A%3C%2FclipPath%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    top: 3px;
+    left: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.post .wp-block-quote::before,
+.post .wp-block-quote::after{
+    content: '';
+    position: absolute;
+    background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --%3E%3Csvg fill='%23666' width='800px' height='800px' viewBox='0 0 36 36' version='1.1' preserveAspectRatio='xMidYMid meet' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3Eblock-quote-line%3C/title%3E%3Cpath d='M11.86,16.55a4.31,4.31,0,0,0-2.11.56,14.44,14.44,0,0,1,4.36-6,1.1,1.1,0,0,0-1.4-1.7c-4,3.25-5.78,7.75-5.78,10.54A5.08,5.08,0,0,0,10,24.58a4.4,4.4,0,0,0,1.88.44,4.24,4.24,0,1,0,0-8.47Z' class='clr-i-outline clr-i-outline-path-1'%3E%3C/path%3E%3Cpath d='M23,16.55a4.29,4.29,0,0,0-2.11.56,14.5,14.5,0,0,1,4.35-6,1.1,1.1,0,1,0-1.39-1.7c-4,3.25-5.78,7.75-5.78,10.54a5.08,5.08,0,0,0,3,4.61A4.37,4.37,0,0,0,23,25a4.24,4.24,0,1,0,0-8.47Z' class='clr-i-outline clr-i-outline-path-2'%3E%3C/path%3E%3Crect x='0' y='0' width='36' height='36' fill-opacity='0'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    width: 36px;
+    height: 36px;
+}
+.post .wp-block-quote::before{
+    left: 8px;
+    top: -18px;
+}
+.post .wp-block-quote::after{
+    right: 8px;
+    bottom: -18px;
+    transform: rotate(180deg);
+}
+
+.toc_list{
+    position: relative;
+}
+.toc_list::before{
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 4px;
+    background: #000;
+    height: calc(100% - 8px);
+    width: 1px;
+}
+.toc_list > li li .toc_number::after{
+    content: '.';
+}
