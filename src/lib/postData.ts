@@ -1,10 +1,9 @@
 import { getCategories } from "@/lib/wp";
-import { PER_PAGE } from '@/utils/config';
+import { BASE_URL, PER_PAGE } from '@/utils/config';
 
 //投稿をページごとに取得（ページネーション）
-const base = import.meta.env.PUBLIC_API_URL.replace(/\/+$/, "") + "/";
 export async function getPaginatedPosts(page: number = 1, perPage: number = PER_PAGE) {
-  const res = await fetch(`${base}posts?_embed&page=${page}&per_page=${perPage}`);
+  const res = await fetch(`${BASE_URL}posts?_embed&page=${page}&per_page=${perPage}`);
   const posts = await res.json();
 
   const total = parseInt(res.headers.get("X-WP-Total") || "0", 10);         // 投稿の総数
@@ -29,10 +28,8 @@ export async function getPostListWithCategories(page: number, perPage: number) {
 
 // ピックアップ投稿タイプの取得
 export async function getPickupPosts() {
-  const baseUrl = import.meta.env.PUBLIC_API_URL;
-
   // ピックアップ取得
-  const res = await fetch(`${baseUrl}pickup?acf_format=standard`);
+  const res = await fetch(`${BASE_URL}pickup?acf_format=standard`);
   const pickupList = await res.json();
 
   if (!Array.isArray(pickupList) || pickupList.length === 0) return [];
@@ -46,7 +43,7 @@ export async function getPickupPosts() {
 
   const params = `include=${allRelatedIds.join(",")}`;
 
-  const postRes = await fetch(`${baseUrl}posts?_embed&${params}`);
+  const postRes = await fetch(`${BASE_URL}posts?_embed&${params}`);
   const posts = await postRes.json();
 
   // エラー対策：postsが配列か確認
@@ -63,7 +60,7 @@ export async function getPickupPosts() {
 
 //詳細ページ取得
 export async function fetchPostIds() {
-  const res = await fetch(`${import.meta.env.PUBLIC_API_URL}posts`);
+  const res = await fetch(`${BASE_URL}posts`);
   const posts = await res.json();
 
   return posts.map((post) => ({
@@ -74,7 +71,6 @@ export async function fetchPostIds() {
 
 // カテゴリー別に投稿をページネーション付きで取得する関数
 export async function getPaginatedPostsByCategory(categorySlug: string, page: number = 1, perPage: number = PER_PAGE) {
-  const base = import.meta.env.PUBLIC_API_URL.replace(/\/+$/, "") + "/";
   const categories = await getCategories();
 
   const targetCategory = categories.find(cat => cat.slug === categorySlug);
@@ -92,7 +88,7 @@ export async function getPaginatedPostsByCategory(categorySlug: string, page: nu
   }
 
   const query = `categories=${categoryIds.join(',')}&_embed&page=${page}&per_page=${perPage}`;
-  const res = await fetch(`${base}posts?${query}`);
+  const res = await fetch(`${BASE_URL}posts?${query}`);
   const posts = await res.json();
 
   const total = parseInt(res.headers.get("X-WP-Total") || "0", 10);
@@ -110,7 +106,6 @@ export async function getPaginatedPostsByCategory(categorySlug: string, page: nu
 
 //関連する記事の取得
 export async function getRelatedPosts(currentPostId: number, categorySlug: string, limit: number = 3) {
-  const base = import.meta.env.PUBLIC_API_URL.replace(/\/+$/, "") + "/";
   const categories = await getCategories();
 
   // 対象カテゴリーをIDで特定
@@ -119,7 +114,7 @@ export async function getRelatedPosts(currentPostId: number, categorySlug: strin
 
   // クエリで対象カテゴリの投稿を取得。_embed付きで最新順、自己投稿除外
   const query = `categories=${targetCategory.id}&_embed&per_page=${limit + 1}&orderby=date&order=desc`;
-  const res = await fetch(`${base}posts?${query}`);
+  const res = await fetch(`${BASE_URL}posts?${query}`);
   const posts = await res.json();
 
   // 自分の記事を除外し、limit件まで絞る

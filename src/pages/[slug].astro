@@ -4,10 +4,10 @@ import Layout from "@/layouts/Layout.astro";
 
 import { getPages, getPageBySlug } from "@/lib/wp";
 import { formatDateToDotAndWeekday } from '@/utils/date';
+import { BASE_URL } from '@/utils/config';
 
 export async function getStaticPaths() {
   const pages = await getPages();
-  // console.log('pages:', pages);
   return pages.map(page => ({
     params: { slug: page.slug }
   }));
@@ -23,7 +23,7 @@ if (!post) {
 // 投稿者IDを取得
 const authorId = post.author;
 // 投稿者情報を別リクエストで取得（ACF含む）
-const authorRes = await fetch(`${import.meta.env.PUBLIC_API_URL}users/${authorId}`);
+const authorRes = await fetch(`${BASE_URL}users/${authorId}`);
 const author = await authorRes.json();
 
 const authorData = post._embedded?.author?.[0] || {};
