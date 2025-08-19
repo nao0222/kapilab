@@ -8,11 +8,18 @@ import { formatDateToDotAndWeekday } from '@/utils/date';
 import { getCategories } from "@/lib/wp";
 
 export async function getStaticPaths() {
-  const paths = [];
+  const paths: { params: { parent: string; page: string } }[] = [];
 
   try {
     const categories = await getCategories();
-    const parents = categories.filter(cat => !cat.parent);
+
+    if (!categories || !Array.isArray(categories)) {
+      console.warn("カテゴリ取得に失敗しました: 配列ではありません");
+      return [];
+    }
+
+    // 親カテゴリだけ抽出（WordPressだと parent=0 がトップカテゴリ）
+    const parents = categories.filter((cat: any) => !cat.parent || cat.parent === 0);
 
     for (const parent of parents) {
       try {
@@ -21,15 +28,16 @@ export async function getStaticPaths() {
 
         for (let page = 1; page <= totalPages; page++) {
           paths.push({
-            params: { parent: parent.slug, page: page.toString() },
+            params: { parent: parent.slug, page: String(page) },
           });
         }
-      } catch {
-        console.warn(`Failed to fetch posts for category ${parent.slug}`);
+      } catch (err) {
+        console.warn(`カテゴリ ${parent.slug} の記事取得に失敗しました`, err);
       }
     }
-  } catch {
-    console.warn('Failed to fetch categories');
+  } catch (err) {
+    console.error("カテゴリ取得に失敗しました", err);
+    return []; // ここで空配列を返せばビルド失敗は防げる
   }
 
   return paths;
