@@ -9,8 +9,13 @@ export async function getPosts() {
 
 //カテゴリーの取得
 export async function getCategories() {
-  const res = await fetch(`${BASE_URL}categories?per_page=50`);
+  // URLオブジェクトで絶対URLを生成
+  const url = new URL("categories", BASE_URL);
+  url.searchParams.set("per_page", "50");
+
+  const res = await fetch(url.toString());
   if (!res.ok) throw new Error("カテゴリ取得に失敗しました");
+
   const categories = await res.json();
   return categories;
 }
