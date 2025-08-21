@@ -9,15 +9,15 @@ export async function getPosts() {
 
 //カテゴリーの取得
 export async function getCategories() {
-  // URLオブジェクトで絶対URLを生成
+  if (!BASE_URL) throw new Error("PUBLIC_API_URL が設定されていませんよー");
+
   const url = new URL("categories", BASE_URL);
   url.searchParams.set("per_page", "50");
 
   const res = await fetch(url.toString());
-  if (!res.ok) throw new Error("カテゴリ取得に失敗しましたよ！!!!");
+  if (!res.ok) throw new Error(`カテゴリ取得に失敗しました！: ${res.status}`);
 
-  const categories = await res.json();
-  return categories;
+  return await res.json();
 }
 
 //ピックアップの取得
