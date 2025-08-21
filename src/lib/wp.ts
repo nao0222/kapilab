@@ -14,7 +14,7 @@ export async function getCategories() {
   url.searchParams.set("per_page", "50");
 
   const res = await fetch(url.toString());
-  if (!res.ok) throw new Error("カテゴリ取得に失敗しましたよー");
+  if (!res.ok) throw new Error("カテゴリ取得に失敗しましたよ！");
 
   const categories = await res.json();
   return categories;
