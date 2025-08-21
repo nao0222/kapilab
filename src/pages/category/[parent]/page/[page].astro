@@ -7,26 +7,44 @@ import { getPaginatedPostsByCategory } from "@/lib/postData";
 import { formatDateToDotAndWeekday } from '@/utils/date';
 import { getCategories } from "@/lib/wp";
 
+
 export async function getStaticPaths() {
-  const categories = await getCategories();
-  const parents = categories.filter(cat => !cat.parent);
+  try {
+    const categories = await getCategories();
+    const parents = categories.filter(cat => !cat.parent);
 
-  const paths = [];
+    const allPaths: { params: { parent: string; page: string } }[] = [];
 
-  for (const parent of parents) {
-    const { totalPages } = await getPaginatedPostsByCategory(parent.slug, 1);
+    // 並列でカテゴリごとのページ取得
+    await Promise.all(
+      parents.map(async (parent) => {
+        try {
+          const { totalPages } = await getPaginatedPostsByCategory(parent.slug, 1);
 
-    for (let page = 1; page <= totalPages; page++) {
-      paths.push({
-        params: {
-          parent: parent.slug,
-          page: page.toString()
+          for (let page = 1; page <= totalPages; page++) {
+            allPaths.push({
+              params: {
+                parent: parent.slug,
+                page: page.toString(),
+              },
+            });
+          }
+        } catch (err) {
+          console.error(`カテゴリ "${parent.slug}" のページ取得に失敗:`, err);
+          // 失敗しても他のカテゴリは処理される
         }
-      });
-    }
-  }
+      })
+    );
 
-  return paths;
+    if (allPaths.length === 0) {
+      console.warn('全カテゴリのページ取得に失敗しました');
+    }
+
+    return allPaths;
+  } catch (err) {
+    console.error('Cloudflareビルド中にカテゴリ取得に失敗:', err);
+    return []; // 失敗時は空配列を返す
+  }
 }
 
 const { parent, page } = Astro.params;
