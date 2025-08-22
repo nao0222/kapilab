@@ -7,20 +7,18 @@ import Layout from "@/layouts/Layout.astro";
 //     "Cache-Control": "no-cache"
 //   }
 // });
-const API_URL = "https://kapilab.sumika-creative.net/wp-json/wp/v2/posts";
+const USER = "kapilabpass";
+const APP_PASSWORD = "YdbV RoaF VBC4 SoBH iVxU SiaO";
 
-const res = await fetch(API_URL, {
+const token = Buffer.from(`${USER}:${APP_PASSWORD}`).toString("base64");
+
+const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/posts", {
   headers: {
+    "Authorization": `Basic ${token}`,
     "Cache-Control": "no-cache",
-    "User-Agent": "AstroWorker/1.0"  // ← ここに User-Agent を設定
+    "User-Agent": "AstroWorker/1.0",
   },
 });
-
-if (!res.ok || !res.headers.get("content-type")?.includes("application/json")) {
-  throw new Error(`API fetch failed or returned non-JSON: ${res.status} ${res.statusText}`);
-}
-
-const posts = await res.json();
 
 
 ---
