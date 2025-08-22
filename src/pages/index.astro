@@ -2,11 +2,31 @@
 import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 
-const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/posts", {
-  headers: {
-    "User-Agent": "Mozilla/5.0 (compatible; AstroSSR/1.0)"
-  }
+// const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/", {
+//   headers: {
+//     "Cache-Control": "no-cache"
+//   }
+// });
+const API_URL =
+  (typeof globalThis !== "undefined" && globalThis.PUBLIC_API_URL) || 
+  import.meta.env.PUBLIC_API_URL ||
+  "";
+
+const POSTS_ENDPOINT = API_URL + "posts";
+
+if (!POSTS_ENDPOINT) {
+  throw new Error("API URL is not defined");
+}
+
+const res = await fetch(POSTS_ENDPOINT, {
+  headers: { "Cache-Control": "no-cache" }
 });
+
+// JSON レスポンスチェック
+if (!res.ok || !res.headers.get("content-type")?.includes("application/json")) {
+  throw new Error(`API fetch failed or returned non-JSON: ${res.status} ${res.statusText}`);
+}
+
 const posts = await res.json();
 
 
