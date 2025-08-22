@@ -2,17 +2,11 @@
 import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 
-// import { getPostListWithCategories, getPickupPosts } from "@/lib/postData";
-// import { formatDateToDotAndWeekday } from '@/utils/date';
-// import Pagination from "@/components/pagination.astro";
-
-// const { posts, totalPages, categoryMap } = await getPostListWithCategories();
-// const pickupPosts = await getPickupPosts();
-
-// const currentPage = 1;
-
-
-const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/posts");
+const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/posts", {
+  headers: {
+    "User-Agent": "Mozilla/5.0 (compatible; AstroSSR/1.0)"
+  }
+});
 const posts = await res.json();
 
 
@@ -22,6 +16,7 @@ const posts = await res.json();
 <Layout>
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="container mx-auto px-5 lg:px-10 md:py-14 py-8">
+			<h1>テスト</h1>
 			{
 				posts.map((post) => (
 					<h2 set:html={post.title.rendered} />
