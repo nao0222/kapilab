@@ -7,18 +7,34 @@ import Layout from "@/layouts/Layout.astro";
 //     "Cache-Control": "no-cache"
 //   }
 // });
-const USER = "kapilab";
-const APP_PASSWORD = "YdbV RoaF VBC4 SoBH iVxU SiaO";
 
-const token = Buffer.from(`${USER}:${APP_PASSWORD}`).toString("base64");
 
-const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/posts", {
-  headers: {
-    "Authorization": `Basic ${token}`,
-    "Cache-Control": "no-cache",
-    "User-Agent": "AstroWorker/1.0",
-  },
-});
+// WordPress REST API URL
+const API_URL = "https://kapilab.sumika-creative.net/wp-json/wp/v2/posts";
+
+// 認証情報（必要な場合だけ）
+const USER = import.meta.env.WP_USER || "kapilab";
+const APP_PASSWORD = import.meta.env.WP_APP_PASSWORD || "YdbV RoaF VBC4 SoBH iVxU SiaO";
+
+// fetch のヘッダー設定
+const headers: Record<string,string> = {
+  "Cache-Control": "no-cache",
+  "User-Agent": "AstroWorker/1.0", // Worker からのアクセス用
+};
+
+if (USER && APP_PASSWORD) {
+  const token = Buffer.from(`${USER}:${APP_PASSWORD}`).toString("base64");
+  headers["Authorization"] = `Basic ${token}`;
+}
+
+// WP REST API 取得
+const res = await fetch(API_URL, { headers });
+
+if (!res.ok || !res.headers.get("content-type")?.includes("application/json")) {
+  throw new Error(`API fetch failed or returned non-JSON: ${res.status} ${res.statusText}`);
+}
+
+const posts = await res.json();
 
 
 ---
@@ -28,12 +44,12 @@ const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/posts
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="container mx-auto px-5 lg:px-10 md:py-14 py-8">
 			<h1>テスト</h1>
-			{
-				posts.map((post) => (
-					<h2 set:html={post.title.rendered} />
-					<p set:html={post.content.rendered} />
-				))
-			}
+			{posts.map(post => (
+				<>
+				<h2 set:html={post.title.rendered} />
+				<p set:html={post.content.rendered} />
+				</>
+			))}
 		</div>
 	</main>
 </Layout>
