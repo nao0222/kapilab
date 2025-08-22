@@ -11,5 +11,8 @@
   },
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "PUBLIC_API_URL": "https://kapilab.sumika-creative.net/wp-json/wp/v2/"
   }
 }
