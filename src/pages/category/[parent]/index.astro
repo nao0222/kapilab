@@ -1,15 +1,43 @@
 ---
 import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
-
-import { getPostListWithCategories, getPickupPosts } from "@/lib/postData";
-import { formatDateToDotAndWeekday } from '@/utils/date';
 import Pagination from "@/components/pagination.astro";
 
-const { posts, totalPages, categoryMap } = await getPostListWithCategories();
-const pickupPosts = await getPickupPosts();
+import { getPaginatedPostsByCategory } from "@/lib/postData";
+import { formatDateToDotAndWeekday } from '@/utils/date';
+import { getCategories } from "@/lib/wp";
 
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  const parents = categories.filter(cat => !cat.parent);
+
+  const paths = [];
+
+  for (const parent of parents) {
+    const { totalPages } = await getPaginatedPostsByCategory(parent.slug, 1);
+
+    for (let page = 1; page <= totalPages; page++) {
+      paths.push({
+        params: {
+          parent: parent.slug,
+          page: page.toString()
+        }
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { parent } = Astro.params;
 const currentPage = 1;
+
+const categories = await getCategories();
+const categoryObj = categories.find(cat => cat.slug === parent);
+if (!categoryObj) throw new Error(`Category '${parent}' not found`);
+const categoryName = categoryObj.name;
+
+const { posts, totalPages, categoryMap } = await getPaginatedPostsByCategory(parent, currentPage);
 
 ---
 
@@ -17,20 +45,7 @@ const currentPage = 1;
 <Layout>
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="container mx-auto px-5 lg:px-10 md:py-14 py-8">
-			<ul class="grid md:flex md:gap-x-10 gap-y-8 md:gap-y-0">
-				{pickupPosts.map((post) => (
-					<li class="w-full md:w-[48.3%]">
-						<a href={`/${post.slug}`} class="group">
-							<div class="overflow-hidden rounded-2xl"><img class="w-full transition duration-700 group-hover:scale-105" src={post._embedded['wp:featuredmedia']?.[0]?.source_url ?? ''} alt={post.title.rendered}></div>
-							<div class="flex font-bold text-sm mt-4 transition duration-500 group-hover:text-[#FE2F8C]">
-								<p class="">{formatDateToDotAndWeekday(post.date)}</p>
-								<p class="ml-[35px]">{post.categories.map((catId) => categoryMap.get(catId)).join(" / ")}</p>
-							</div>
-							<h3 class="text-lg md:text-2xl mt-2 font-bold leading-relaxed transition duration-500 group-hover:text-[#FE2F8C]">{post.title.rendered}</h3>
-						</a>
-					</li>
-				))}
-			</ul>
+			<h2 class="text-2xl font-bold">{categoryName}の記事一覧</h2>
 			<ul class="gap-y-6 md:gap-y-10 md:gap-x-[5.6%] lg:gap-x-[2%] mt-10 grid md:flex md:flex-wrap">
 				{posts.map((post:any) => (
 					<li class="md:w-[47.2%] lg:w-[32%]">
@@ -48,8 +63,7 @@ const currentPage = 1;
 				))}
 			</ul>
 
-			<Pagination currentPage={currentPage} totalPages={totalPages} basePath="" />
-
+			<Pagination currentPage={currentPage} totalPages={totalPages} basePath={`/category/${parent}`} />
 		</div>
 
 	</main>
