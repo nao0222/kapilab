@@ -11,5 +11,8 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
+  site: 'http://kapilab.jp',
+  base: '/',
+
   adapter: cloudflare()
 });
