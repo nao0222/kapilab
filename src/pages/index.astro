@@ -2,40 +2,14 @@
 import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 
-// const res = await fetch("https://kapilab.sumika-creative.net/wp-json/wp/v2/", {
-//   headers: {
-//     "Cache-Control": "no-cache"
-//   }
-// });
+import { getPostListWithCategories, getPickupPosts } from "@/lib/postData";
+import { formatDateToDotAndWeekday } from '@/utils/date';
+import Pagination from "@/components/pagination.astro";
 
+const { posts, totalPages, categoryMap } = await getPostListWithCategories();
+const pickupPosts = await getPickupPosts();
 
-// WordPress REST API URL
-const API_URL = "https://kapilab.sumika-creative.net/wp-json/wp/v2/posts";
-
-// 認証情報（必要な場合だけ）
-const USER = import.meta.env.WP_USER || "kapilab";
-const APP_PASSWORD = import.meta.env.WP_APP_PASSWORD || "YdbV RoaF VBC4 SoBH iVxU SiaO";
-
-// fetch のヘッダー設定
-const headers: Record<string,string> = {
-  "Cache-Control": "no-cache",
-  "User-Agent": "AstroWorker/1.0", // Worker からのアクセス用
-};
-
-if (USER && APP_PASSWORD) {
-  const token = Buffer.from(`${USER}:${APP_PASSWORD}`).toString("base64");
-  headers["Authorization"] = `Basic ${token}`;
-}
-
-// WP REST API 取得
-const res = await fetch(API_URL, { headers });
-
-if (!res.ok || !res.headers.get("content-type")?.includes("application/json")) {
-  throw new Error(`API fetch failed or returned non-JSON: ${res.status} ${res.statusText}`);
-}
-
-const posts = await res.json();
-
+const currentPage = 1;
 
 ---
 
@@ -43,13 +17,40 @@ const posts = await res.json();
 <Layout>
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="container mx-auto px-5 lg:px-10 md:py-14 py-8">
-			<h1>テスト</h1>
-			{posts.map(post => (
-				<>
-				<h2 set:html={post.title.rendered} />
-				<p set:html={post.content.rendered} />
-				</>
-			))}
+			<ul class="grid md:flex md:gap-x-10 gap-y-8 md:gap-y-0">
+				{pickupPosts.map((post) => (
+					<li class="w-full md:w-[48.3%]">
+						<a href={`/${post.slug}`} class="group">
+							<div class="overflow-hidden rounded-2xl"><img class="w-full transition duration-700 group-hover:scale-105" src={post._embedded['wp:featuredmedia']?.[0]?.source_url ?? ''} alt={post.title.rendered}></div>
+							<div class="flex font-bold text-sm mt-4 transition duration-500 group-hover:text-[#FE2F8C]">
+								<p class="">{formatDateToDotAndWeekday(post.date)}</p>
+								<p class="ml-[35px]">{post.categories.map((catId) => categoryMap.get(catId)).join(" / ")}</p>
+							</div>
+							<h3 class="text-lg md:text-2xl mt-2 font-bold leading-relaxed transition duration-500 group-hover:text-[#FE2F8C]">{post.title.rendered}</h3>
+						</a>
+					</li>
+				))}
+			</ul>
+			<ul class="gap-y-6 md:gap-y-10 md:gap-x-[5.6%] lg:gap-x-[2%] mt-10 grid md:flex md:flex-wrap">
+				{posts.map((post:any) => (
+					<li class="md:w-[47.2%] lg:w-[32%]">
+						<a href={`/${post.slug}`} class="group">
+							<div class="flex relative">
+								<p class="text-[#999] text-xs rotate-90 absolute -top-[7px] left-[7px] origin-left">{formatDateToDotAndWeekday(post.date)}</p>
+								<div class="overflow-hidden rounded-2xl w-full ml-6"><img class="w-full transition duration-700 group-hover:scale-105" src={post._embedded["wp:featuredmedia"]?.[0]?.source_url ?? ""} alt={post.title.rendered}></div>
+							</div>
+							<div class="border-1 border-black mr-6 p-5 rounded-2xl -mt-10 z-10 relative bg-[#F5F3EE] transition duration-500 group-hover:text-[#FE2F8C]">
+								<p class="font-bold text-sm">{post.categories.map((catId) => categoryMap.get(catId)).join(" / ")}</p>
+								<h3 class="font-bold mt-2">{post.title.rendered}</h3>
+							</div>
+						</a>
+					</li>
+				))}
+			</ul>
+
+			<Pagination currentPage={currentPage} totalPages={totalPages} basePath="" />
+
 		</div>
+
 	</main>
 </Layout>
