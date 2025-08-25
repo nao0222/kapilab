@@ -13,6 +13,6 @@
     "enabled": true
   },
   "vars": {
-    "PUBLIC_API_URL": "https://kapilab.sumika-creative.net/wp-json/wp/v2/"
+    "PUBLIC_API_URL": "http://wp.kapilab.jp/wp-json/wp/v2/"
   }
 }
