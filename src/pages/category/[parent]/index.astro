@@ -49,7 +49,7 @@ const { posts, totalPages, categoryMap } = await getPaginatedPostsByCategory(par
 			<ul class="gap-y-6 md:gap-y-10 md:gap-x-[5.6%] lg:gap-x-[2%] mt-10 grid md:flex md:flex-wrap">
 				{posts.map((post:any) => (
 					<li class="md:w-[47.2%] lg:w-[32%]">
-						<a href={`/${post.slug}`} class="group">
+						<a href={`/${post.slug}/`} class="group">
 							<div class="flex relative">
 								<p class="text-[#999] text-xs rotate-90 absolute -top-[7px] left-[7px] origin-left">{formatDateToDotAndWeekday(post.date)}</p>
 								<div class="overflow-hidden rounded-2xl w-full ml-6"><img class="w-full transition duration-700 group-hover:scale-105" src={post._embedded["wp:featuredmedia"]?.[0]?.source_url ?? ""} alt={post.title.rendered}></div>

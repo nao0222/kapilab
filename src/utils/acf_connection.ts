@@ -26,7 +26,7 @@ export async function replaceRelatedBlockWithContent(html: string) {
             <p class="text-center relative z-1">
               <span class="inline-block bg-black text-white text-xs font-bold py-[6px] px-7">${customTitle}</span>
             </p>
-            <a href="${link}" class="block -mt-4 group text-black no-underline">
+            <a href="${link}/" class="block -mt-4 group text-black no-underline">
               <div class="border border-black bg-white rounded-[5px] px-6 pt-8 pb-6 lg:p-6 lg:flex lg:items-center">
                 <div class="overflow-hidden rounded-2xl lg:w-[33%]"><img src="${featuredImage}" alt="${title}" class="w-full transition duration-500 group-hover:scale-105"></div>
                 <div class="lg:w-[46%] lg:ml-[4%]">
