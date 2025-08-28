@@ -20,15 +20,6 @@ export async function getCategories() {
   return await res.json();
 }
 
-//ピックアップの取得
-// export async function getPickup() {
-//   const res = await fetch(`${BASE_URL}pickup?acf_format=standard`);
-//   const pickup = await res.json();
-//   const relatedIds = pickup[0]?.acf?.related_posts ?? [];
-//   return pickup;
-// }
-
-
 // 固定ページ一覧を取得
 export async function getPages() {
   const res = await fetch(`${BASE_URL}pages`);
