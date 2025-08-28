@@ -18,7 +18,7 @@ html{
         scroll-margin-top: 110px;
     }
     .post p{
-        @apply mt-[30px] leading-relaxed;
+        @apply mt-[30px] leading-loose font-medium tracking-wider;
     }
     .post a{
         @apply text-[#2750F3] underline hover:opacity-80;
@@ -83,6 +83,10 @@ html{
     .toc_list > li li{
         @apply ml-8;
     }
+}
+
+.post > div > h2:first-of-type{
+    margin-top: 0 !important;
 }
 
 .post .wp-block-list li::before{

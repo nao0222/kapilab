@@ -1,18 +1,17 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-
 import tailwindcss from '@tailwindcss/vite';
-
 import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
+  integrations: [tailwind()],
   vite: {
-    plugins: [tailwindcss()]
+    build: {
+      cssCodeSplit: true, // CSS を JS から分離してファイル化
+    },
   },
-
-  site: 'http://kapilab.jp',
+  site: 'https://kapilab.jp',
   base: '/',
-
-  adapter: cloudflare()
+  adapter: cloudflare(),
 });
