@@ -45,7 +45,7 @@ const { posts, totalPages, categoryMap } = await getPaginatedPostsByCategory(chi
 								<p class="text-[#999] text-xs rotate-90 absolute -top-[7px] left-[7px] origin-left">{formatDateToDotAndWeekday(post.date)}</p>
 								<div class="overflow-hidden rounded-2xl w-full ml-6"><img class="w-full transition duration-700 group-hover:scale-105" src={post._embedded["wp:featuredmedia"]?.[0]?.source_url ?? ""} alt={post.title.rendered}></div>
 							</div>
-							<div class="border-1 border-black mr-6 p-5 rounded-2xl -mt-10 z-10 relative bg-[#F5F3EE] transition duration-500 group-hover:text-[#FE2F8C]">
+							<div class="border border-black mr-6 p-5 rounded-2xl -mt-10 z-10 relative bg-[#F5F3EE] transition duration-500 group-hover:text-[#FE2F8C]">
 								<p class="font-bold text-sm">{post.categories.map((catId) => categoryMap.get(catId)).join(" / ")}</p>
 								<h3 class="font-bold mt-2">{post.title.rendered}</h3>
 							</div>
