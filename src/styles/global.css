@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html{
     scroll-behavior: smooth;
@@ -6,7 +8,7 @@ html{
 
 @layer base {
     .post h2.wp-block-heading{
-        @apply bg-black text-white text-2xl font-bold px-5 py-4 leading-normal mt-15;
+        @apply bg-black text-white text-2xl font-bold px-5 py-4 leading-normal mt-16;
         scroll-margin-top: 110px;
     }
     .post h3.wp-block-heading{
@@ -27,7 +29,7 @@ html{
         @apply mt-[30px] max-w-full;
     }
     .post .wp-block-list{
-        @apply bg-[#F1ECE5] border-1 rounded-[5px] font-medium mt-[30px] p-7 grid gap-2;
+        @apply bg-[#F1ECE5] border rounded-[5px] font-medium mt-[30px] p-7 grid gap-2;
     }
     .post .wp-block-list li{
         @apply flex relative pl-7;
@@ -46,13 +48,13 @@ html{
         background:linear-gradient(transparent 50%, #FFAFD3 50%);
     }
     .post table{
-        @apply bg-white border-1 w-full mt-10;
+        @apply bg-white border w-full mt-10;
     }
     .post table th{
-        @apply bg-[#F1ECE5] font-bold p-5 border-1;
+        @apply bg-[#F1ECE5] font-bold p-5 border;
     }
     .post table td{
-        @apply border-1 font-medium p-5;
+        @apply border font-medium p-5;
     }
     .post .wp-block-buttons{
         @apply mt-10;
