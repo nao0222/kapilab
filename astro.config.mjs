@@ -7,5 +7,5 @@ export default defineConfig({
   integrations: [tailwind()],
   site: 'https://kapilab.jp',
   base: '/',
-  output: 'static',
+  // output: 'static',
 });
