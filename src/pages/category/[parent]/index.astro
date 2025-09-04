@@ -6,6 +6,9 @@ import Pagination from "@/components/pagination.astro";
 import { getPaginatedPostsByCategory } from "@/lib/postData";
 import { formatDateToDotAndWeekday } from '@/utils/date';
 import { getCategories } from "@/lib/wp";
+import { stripHtml } from "@/utils/stripHtml";
+import { BASE_URL } from "@/utils/config";
+
 
 export async function getStaticPaths() {
   const categories = await getCategories();
@@ -39,10 +42,26 @@ const categoryName = categoryObj.name;
 
 const { posts, totalPages, categoryMap } = await getPaginatedPostsByCategory(parent, currentPage);
 
+
+// YoastSEO 情報を取得
+const res = await fetch(`${BASE_URL}categories/${categoryObj.id}?_fields=id,name,slug,yoast_head_json`);
+const categoryDetail = await res.json();
+const yoast = categoryDetail.yoast_head_json || {};
+const meta = {
+  title: stripHtml(yoast.title) || `${categoryObj.name} の記事一覧`,
+  description: stripHtml(yoast.description) || `${categoryObj.name} に関する記事まとめ`,
+  og_title: stripHtml(yoast.og_title) || categoryObj.name,
+  og_description: stripHtml(yoast.og_description) || `${categoryObj.name} の記事一覧`,
+  og_image: yoast.og_image || [],
+  twitter_title: stripHtml(yoast.twitter_title) || categoryObj.name,
+  twitter_description: stripHtml(yoast.twitter_description) || `${categoryObj.name} の記事一覧`,
+  twitter_image: yoast.twitter_image || []
+};
+
 ---
 
 
-<Layout>
+<Layout {...meta}>
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="container mx-auto px-5 lg:px-10 md:py-14 py-8">
 			<h2 class="text-2xl font-bold">{categoryName}の記事一覧</h2>

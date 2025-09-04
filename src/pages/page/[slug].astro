@@ -7,6 +7,7 @@ import { getPostListWithCategories, getPickupPosts, fetchPostIds, getRelatedPost
 import { formatDateToDotAndWeekday } from '@/utils/date';
 import { generateTOCAndContent } from '@/utils/toc';
 import { replaceRelatedBlockWithContent } from '@/utils/acf_connection';
+import { stripHtml } from '@/utils/stripHtml';
 import { BASE_URL } from '@/utils/config';
 
 export async function getStaticPaths() {
@@ -29,13 +30,6 @@ const authorId = post.author;
 const authorsRes = await fetch(`${BASE_URL}users`);
 const authors = await authorsRes.json();
 
-// const authorData = post._embedded?.author?.[0] || {};
-// const authorName = authorData.name || '名無し';
-// const authorProfile = authorData.description || '';
-// const authorAvatar = authorData.avatar_urls?.['96'] || '';
-// const authorX = author.acf?.x || '';
-// const authorInstagram = author.acf?.instagram || '';
-
 const authorList = authors.map(user => ({
   id: user.id,
   name: user.name,
@@ -47,9 +41,23 @@ const authorList = authors.map(user => ({
 
 const { updatedHtml } = generateTOCAndContent(post.content.rendered);
 const contentHtml = await replaceRelatedBlockWithContent(updatedHtml);
+
+// Yoast SEO
+const yoast = post.yoast_head_json || {};
+const meta = {
+    title: yoast.title || post.title.rendered,
+    description: stripHtml(yoast.description || post.excerpt?.rendered),
+    og_title: stripHtml(yoast.og_title) || post.title.rendered,
+    og_description: stripHtml(yoast.og_description) || stripHtml(post.excerpt?.rendered),
+    og_image: yoast.og_image || [],
+    twitter_title: stripHtml(yoast.twitter_title) || post.title.rendered,
+    twitter_description: stripHtml(yoast.twitter_description) || stripHtml(post.excerpt?.rendered),
+    twitter_image: yoast.twitter_image || []
+};
+
 ---
 
-<Layout>
+<Layout {...meta}>
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="border-b">
             <div class="container mx-auto px-5 lg:px-10 md:py-20 py-10 flex flex-wrap justify-between items-center">

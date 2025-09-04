@@ -5,16 +5,33 @@ import Layout from "@/layouts/Layout.astro";
 import { getPostListWithCategories, getPickupPosts } from "@/lib/postData";
 import { formatDateToDotAndWeekday } from '@/utils/date';
 import Pagination from "@/components/pagination.astro";
+import { stripHtml } from '@/utils/stripHtml';
+import { BASE_URL} from '@/utils/config';
 
+// 投稿とカテゴリーデータを取得
 const { posts, totalPages, categoryMap } = await getPostListWithCategories();
 const pickupPosts = await getPickupPosts();
 
 const currentPage = 1;
 
+
+// Yoast SEO
+const res = await fetch(`${BASE_URL}yoast/v1/get_head?url=${BASE_URL}`);
+const yoast = await res.json();
+const meta = {
+	title: yoast.title || 'カピラボ',
+	description: stripHtml(yoast.description || 'カピラボは、Web制作初心者〜中級者向けの情報サイトです。最新技術や便利なノウハウ、実践的なコツを分かりやすく解説し、学びながら楽しめる内容を提供します。'),
+	og_title: yoast.og_title || yoast.title,
+	og_description: yoast.og_description || yoast.description,
+	og_image: yoast.og_image || '/default-og-image.png',
+	twitter_title: yoast.twitter_title || yoast.title,
+	twitter_description: yoast.twitter_description || yoast.description,
+	twitter_image: yoast.twitter_image || '/default-twitter-image.png'
+};
 ---
 
 
-<Layout>
+<Layout {...meta}>
 	<main class="pt-[64px] lg:pt-[100px]">
 		<div class="container mx-auto px-5 lg:px-10 md:py-14 py-8">
 			<ul class="grid md:flex md:gap-x-10 gap-y-8 md:gap-y-0">
