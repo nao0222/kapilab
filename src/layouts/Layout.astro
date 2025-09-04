@@ -2,6 +2,17 @@
 import "@/styles/global.css";
 import Header from "@/components/header.astro";
 import Footer from "@/components/footer.astro";
+
+const {
+  title = '',
+  description = '',
+  og_title = '',
+  og_description = '',
+  og_image = [],
+  twitter_title = '',
+  twitter_description = '',
+  twitter_image = ''
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -11,8 +22,23 @@ import Footer from "@/components/footer.astro";
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-		<link rel="stylesheet" href="/src/styles/global.css">
+		<title>{title}</title>
+		<meta name="description" content={description} />
+
+		<!-- OGP -->
+		<meta property="og:title" content={og_title || title} />
+		<meta property="og:description" content={og_description || description} />
+		{og_image.length > 0 && <meta property="og:image" content={og_image[0].url} />}
+		<meta property="og:type" content="article" />
+
+		<!-- Twitterカード -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={twitter_title} />
+		<meta name="twitter:description" content={twitter_description} />
+		{twitter_image.length > 0 && (
+			<meta name="twitter:image" content={twitter_image[0].url} />
+		)}
+
 	</head>
 	<body class="bg-[#F5F3EE]">
 		<Header />

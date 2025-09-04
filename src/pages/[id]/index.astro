@@ -2,13 +2,13 @@
 import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 
-import { getCategories } from "@/lib/wp";
+import { getCategories, getPostById } from "@/lib/wp";
 import { getPostListWithCategories, getPickupPosts, fetchPostIds, getRelatedPosts } from "@/lib/postData";
 import { formatDateToDotAndWeekday } from '@/utils/date';
 import { generateTOCAndContent } from '@/utils/toc';
 import { replaceRelatedBlockWithContent } from '@/utils/acf_connection';
+import { stripHtml } from '@/utils/stripHtml';
 import { BASE_URL } from '@/utils/config';
-
 
 
 export async function getStaticPaths() {
@@ -16,8 +16,7 @@ export async function getStaticPaths() {
 }
 
 const { id } = Astro.params;
-const res = await fetch(`${BASE_URL}posts/${id}?_embed`);
-const post = await res.json();
+const post = await getPostById(id);
 
 //ピックアップ
 const { posts, categoryMap } = await getPostListWithCategories();
@@ -50,10 +49,24 @@ const categorySlugForRelated = firstCategory?.slug || '';
 
 const relatedPosts = await getRelatedPosts(relatedPost.id, categorySlugForRelated, 3);
 
+
+// Yoast SEO
+const yoast = post.yoast_head_json || {};
+const meta = {
+    title: yoast.title || post.title.rendered,
+    description: stripHtml(yoast.description || post.excerpt?.rendered),
+    og_title: stripHtml(yoast.og_title) || post.title.rendered,
+    og_description: stripHtml(yoast.og_description) || stripHtml(post.excerpt?.rendered),
+    og_image: yoast.og_image || [],
+    twitter_title: stripHtml(yoast.twitter_title) || post.title.rendered,
+    twitter_description: stripHtml(yoast.twitter_description) || stripHtml(post.excerpt?.rendered),
+    twitter_image: yoast.twitter_image || []
+};
+
 ---
 
 
-<Layout>
+<Layout {...meta}>
     <main class="pt-[64px] lg:pt-[100px]">
         <div class="border-b">
             <div class="container mx-auto px-5 lg:px-10 md:py-14 py-8 flex flex-wrap justify-between items-center">

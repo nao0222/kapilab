@@ -27,9 +27,16 @@ export async function getPages() {
   return pages;
 }
 
-// 固定ページ詳細をスラッグやIDで取得
+// 固定ページ詳細をスラッグで取得
 export async function getPageBySlug(slug: string) {
   const res = await fetch(`${BASE_URL}pages?slug=${slug}&_embed`);
   const pages = await res.json();
   return pages.length > 0 ? pages[0] : null;
+}
+
+// 詳細ページをIDで取得
+export async function getPostById(id) {
+  const res = await fetch(`${BASE_URL}posts/${id}?_embed`);
+  if (!res.ok) throw new Error(`Failed to fetch post with id: ${id}`);
+  return await res.json();
 }
