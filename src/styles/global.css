@@ -73,6 +73,7 @@ html{
         @apply bg-white border border-[#ddd] rounded-sm px-[1px] py-[10px] font-[13px];
     }
 
+    
     .toc_list{
         @apply leading-[1.8];
     }
