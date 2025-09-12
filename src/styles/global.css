@@ -32,7 +32,7 @@ html{
         @apply bg-[#F1ECE5] border rounded-[5px] font-medium mt-[30px] p-7 grid gap-2;
     }
     .post .wp-block-list li{
-        @apply flex relative pl-7;
+        @apply relative pl-7;
     }
     .post > .wp-block-quote{
         @apply border border-[#dcdcdc] py-6 px-8 bg-white mt-10 relative;
@@ -70,7 +70,7 @@ html{
         @apply mt-[30px];
     }
     .post code{
-        @apply bg-white border border-[#ddd] rounded py-[1px] px-[10px] text-[13px] leading-none;
+        @apply bg-white border border-[#ddd] rounded py-[3px] px-[10px] text-[13px] leading-none;
     }
 
     .toc_list{
