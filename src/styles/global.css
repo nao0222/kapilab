@@ -66,6 +66,9 @@ html{
         @apply bg-[#DCED22] font-bold text-lg text-black text-center no-underline flex items-center justify-center h-20 rounded-full hover:cursor-pointer;
         box-shadow: 4px 4px 0 0 #B8C805;
     }
+    .post .wp-block-kevinbatdorf-code-block-pro{
+        @apply mt-[30px];
+    }
 
     .toc_list{
         @apply leading-[1.8];
