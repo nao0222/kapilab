@@ -70,10 +70,9 @@ html{
         @apply mt-[30px];
     }
     .post code{
-        @apply bg-white border border-[#ddd] rounded-sm px-[1px] py-[10px] font-[13px];
+        @apply bg-white border border-[#ddd] rounded py-[1px] px-[10px] text-[13px] leading-none;
     }
 
-    
     .toc_list{
         @apply leading-[1.8];
     }
