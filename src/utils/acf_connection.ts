@@ -23,7 +23,7 @@ export async function replaceRelatedBlockWithContent(html: string) {
 
         const html = `
           <div>
-            <p class="text-center relative z-1">
+            <p class="text-center relative z-10">
               <span class="inline-block bg-black text-white text-xs font-bold py-[6px] px-7">${customTitle}</span>
             </p>
             <a href="${link}/" class="block -mt-4 group text-black no-underline">
